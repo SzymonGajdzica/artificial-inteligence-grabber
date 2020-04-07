@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/src/app_ids.csv
+/src/bad_app_ids.txt
+/src/result.csv
+/src/used_app_ids.txt
