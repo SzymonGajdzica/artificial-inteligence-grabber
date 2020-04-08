@@ -69,9 +69,9 @@ if __name__ == '__main__':
                 with tqdm.trange(len(data_holder.app_ids)) as bar:
                     for app_id in data_holder.app_ids:
                         bar.update(1)
-                        if random.random() <= 0.001:
-                            session_handler.restart_session()
                         if app_id not in data_holder.used_app_ids and app_id not in data_holder.bad_app_ids:
+                            if random.random() <= 0.001:
+                                session_handler.restart_session()
                             results = fetch_from_link(session_handler,
                                                       '{0}{1}{2}'.format(link_prefix, app_id, link_suffix))
                             for rating, comment in results:
