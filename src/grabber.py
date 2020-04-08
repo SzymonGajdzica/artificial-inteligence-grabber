@@ -50,7 +50,7 @@ class SessionHandler:
 
 
 def parse_line(line):
-    sliced = line.replace(r'\\"', r"'").split(sep=r'"')
+    sliced = line.replace(r'\\"', r"\'").replace(r'\"', r"\'").split(sep=r'"')
     return sliced[2].replace(',', '').replace('null', '')[-1], sliced[3]
 
 
@@ -63,22 +63,22 @@ def fetch_from_link(session_handler, link):
 if __name__ == '__main__':
     data_holder = DataHolder()
     session_handler = SessionHandler()
-    with open('result.csv', mode='a', encoding="utf-8") as result_file:
-        with open('bad_app_ids.txt', mode='a', encoding="utf-8") as bad_app_ids_file:
-            with open('used_app_ids.txt', mode='a', encoding="utf-8") as used_app_ids_file:
-                with tqdm.trange(len(data_holder.app_ids)) as bar:
-                    for app_id in data_holder.app_ids:
-                        bar.update(1)
-                        if app_id not in data_holder.used_app_ids and app_id not in data_holder.bad_app_ids:
-                            if random.random() <= 0.001:
-                                session_handler.restart_session()
-                            results = fetch_from_link(session_handler,
-                                                      '{0}{1}{2}'.format(link_prefix, app_id, link_suffix))
-                            for rating, comment in results:
-                                result_file.write('{0}\t"{1}"\n'.format(rating, comment))
-                            if len(results) != 0:
-                                data_holder.used_app_ids.add(app_id)
-                                used_app_ids_file.write('{0}\n'.format(app_id))
-                            else:
-                                data_holder.bad_app_ids.add(app_id)
-                                bad_app_ids_file.write('{0}\n'.format(app_id))
+    with tqdm.trange(len(data_holder.app_ids)) as bar:
+        for app_id in data_holder.app_ids:
+            bar.update(1)
+            if app_id not in data_holder.used_app_ids and app_id not in data_holder.bad_app_ids:
+                if random.random() <= 0.001:
+                    session_handler.restart_session()
+                results = fetch_from_link(session_handler,
+                                          '{0}{1}{2}'.format(link_prefix, app_id, link_suffix))
+                if len(results) != 0:
+                    with open('result.csv', mode='a', encoding="utf-8") as result_file:
+                        for rating, comment in results:
+                            result_file.write('{0}\t"{1}"\n'.format(rating, comment))
+                    data_holder.used_app_ids.add(app_id)
+                    with open('used_app_ids.txt', mode='a', encoding="utf-8") as used_app_ids_file:
+                        used_app_ids_file.write('{0}\n'.format(app_id))
+                else:
+                    data_holder.bad_app_ids.add(app_id)
+                    with open('bad_app_ids.txt', mode='a', encoding="utf-8") as bad_app_ids_file:
+                        bad_app_ids_file.write('{0}\n'.format(app_id))
