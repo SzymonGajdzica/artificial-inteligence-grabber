@@ -18,14 +18,14 @@ class DataHolder:
         self.read_helper_files()
 
     def read_helper_files(self):
-        with open('used_app_ids.txt', mode='r') as file:
+        with open('results/used_app_ids.txt', mode='r') as file:
             self.used_app_ids.update(map(lambda line: line.strip(), file.readlines()))
-        with open('bad_app_ids.txt', mode='r') as file:
+        with open('results/bad_app_ids.txt', mode='r') as file:
             self.bad_app_ids.update(map(lambda line: line.strip(), file.readlines()))
 
     def read_source_files(self):
-        with open('app_ids.csv', mode='r') as csv_file:
-            reader = csv.DictReader(csv_file)
+        with open('input/app_ids.csv', mode='r') as file:
+            reader = csv.DictReader(file)
             for row in reader:
                 self.app_ids.add(row['packageName'].strip())
 
@@ -72,13 +72,13 @@ if __name__ == '__main__':
                 results = fetch_from_link(session_handler,
                                           '{0}{1}{2}'.format(link_prefix, app_id, link_suffix))
                 if len(results) != 0:
-                    with open('result.csv', mode='a', encoding="utf-8") as result_file:
+                    with open('results/result.tsv', mode='a', encoding="utf-8") as result_file:
                         for rating, comment in results:
                             result_file.write('{0}\t"{1}"\n'.format(rating, comment))
                     data_holder.used_app_ids.add(app_id)
-                    with open('used_app_ids.txt', mode='a', encoding="utf-8") as used_app_ids_file:
+                    with open('results/used_app_ids.txt', mode='a', encoding="utf-8") as used_app_ids_file:
                         used_app_ids_file.write('{0}\n'.format(app_id))
                 else:
                     data_holder.bad_app_ids.add(app_id)
-                    with open('bad_app_ids.txt', mode='a', encoding="utf-8") as bad_app_ids_file:
+                    with open('results/bad_app_ids.txt', mode='a', encoding="utf-8") as bad_app_ids_file:
                         bad_app_ids_file.write('{0}\n'.format(app_id))
